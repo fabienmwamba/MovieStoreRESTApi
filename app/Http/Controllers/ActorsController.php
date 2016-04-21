@@ -6,11 +6,16 @@ use Illuminate\Http\Request;
 use App\Actor;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-
+use App\Transformers\ActorTransformer;
 
 class ActorsController extends ApiController
 {
+    protected $transformer;
 
+    public function __construct(ActorTransformer $transformer)
+    {
+        $this->transformer = $transformer;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -18,7 +23,12 @@ class ActorsController extends ApiController
      */
     public function index()
     {
+        // return $this->transformer->test();
+        $actors = Actor::all();
 
+        return response()->json([
+          'data' => $this->transformer->transformCollection($actors->toArray())
+        ], 200);
     }
 
     /**
@@ -50,7 +60,8 @@ class ActorsController extends ApiController
      */
     public function show($id)
     {
-        //
+        $actor = Actor::find($id)->toArray();
+        return $this->transformer->transform($actor);
     }
 
     /**
@@ -87,5 +98,5 @@ class ActorsController extends ApiController
         //
     }
 
-    
+
 }
