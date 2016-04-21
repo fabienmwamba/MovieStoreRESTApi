@@ -11,10 +11,16 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 Route::group(['prefix'=>'api/v1'], function(){
     Route::resource('actors', 'ActorsController');
+    Route::resource('countries', 'CountriesController');
+    Route::resource('cities', 'CitiesController');
+    Route::resource('addresses', 'AddressesController');
+    Route::resource('languages', 'LanguagesController');
+    Route::resource('films', 'FilmsController');
+    Route::resource('categories', 'CategoriesController');
+    Route::resource('stores', 'StoresController');
+    Route::resource('inventories', 'InventoriesController');
+    Route::resource('rentals', 'RentalsController');
+
 });

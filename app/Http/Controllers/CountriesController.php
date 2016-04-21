@@ -3,14 +3,20 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Actor;
+
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-
-
-class ActorsController extends ApiController
+use App\Country;
+use App\Transformers\CountryTransformer;
+class CountriesController extends Controller
 {
 
+    protected $transformer;
+
+    public function __construct(CountryTransformer $transformer)
+    {
+        $this->transformer = $transformer;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -18,7 +24,11 @@ class ActorsController extends ApiController
      */
     public function index()
     {
+        $countries = Country::all();
 
+        return response()->json([
+            'data' => $this->transformer->transformCollection($countries->toArray())
+        ]);
     }
 
     /**
@@ -86,6 +96,4 @@ class ActorsController extends ApiController
     {
         //
     }
-
-    
 }

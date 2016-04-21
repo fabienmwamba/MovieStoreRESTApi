@@ -19,3 +19,59 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         'remember_token' => str_random(10),
     ];
 });
+
+$factory->define(App\Actor::class, function (Faker\Generator $faker) {
+    return [
+        'firstname' => $faker->firstName,
+        'lastname' => $faker->lastName,
+    ];
+});
+
+$factory->define(App\Country::class, function (Faker\Generator $faker) {
+    return [
+        'country' => $faker->country,
+    ];
+});
+
+$factory->define(App\City::class, function (Faker\Generator $faker) {
+    return [
+        'city' => $faker->city,
+    ];
+});
+$factory->define(App\Address::class, function (Faker\Generator $faker) {
+    return [
+        'address1' => $faker->streetAddress,
+        'address2' => $faker->streetAddress,
+        'district' => $faker->state,
+        'phone' => $faker->phoneNumber,
+        'postalCode' => $faker->postcode,
+    ];
+});
+
+$factory->define(App\Film::class, function (Faker\Generator $faker) {
+    return [
+        'address1' => $faker->name,
+        'address2' => $faker->name,
+        'district' => $faker->name,
+        'phone' => $faker->PhoneNumber,
+        'postalCode' => $faker->name,
+    ];
+});
+
+$factory->define(App\Language::class, function (Faker\Generator $faker) {
+    return [
+        'name' => $faker->name,
+    ];
+});
+
+$factory->define(App\Category::class, function (Faker\Generator $faker) {
+    return [
+        'name' => $faker->name,
+    ];
+});
+
+$factory->define(App\Store::class, function (Faker\Generator $faker) {
+    return [
+        'name' => $faker->name,
+    ];
+});

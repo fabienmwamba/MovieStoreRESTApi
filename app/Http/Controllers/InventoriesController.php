@@ -3,14 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Actor;
+
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
-
-class ActorsController extends ApiController
+class InventoriesController extends Controller
 {
-
     /**
      * Display a listing of the resource.
      *
@@ -18,7 +16,7 @@ class ActorsController extends ApiController
      */
     public function index()
     {
-
+        //
     }
 
     /**
@@ -86,6 +84,4 @@ class ActorsController extends ApiController
     {
         //
     }
-
-    
 }
