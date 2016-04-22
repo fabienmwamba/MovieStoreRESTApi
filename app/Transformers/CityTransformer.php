@@ -12,6 +12,7 @@ class CityTransformer extends Transformer
           'city_name' => $city['city'],
           'country_id' => $city['country_id'],
           'city_addresses' => $city['addresses'],
+          'city_stores' => $city['stores'],
         ];
     }
 }

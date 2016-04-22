@@ -27,7 +27,7 @@ class CitiesController extends ApiController
     {
         $limit = $request->input('limit') ? $request->input('limit') : 10;
 
-        $cities = City::with('addresses')->paginate($limit);
+        $cities = City::with('addresses', 'stores')->paginate($limit);
 
         return $this->responseOk([
             'cities' => $this->transformer->transformCollection($cities->toArray())

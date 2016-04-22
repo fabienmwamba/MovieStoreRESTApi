@@ -2,10 +2,10 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
-use App\Country;
+use App\Store;
 use App\Address;
-
+use App\Country;
+use Illuminate\Database\Eloquent\Model;
 class City extends Model
 {
     protected $fillable = [
@@ -20,5 +20,10 @@ class City extends Model
     public function addresses()
     {
         return $this->hasMany(Address::class);
+    }
+
+    public function stores()
+    {
+        return $this->hasMany(Store::class);
     }
 }

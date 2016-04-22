@@ -2,12 +2,16 @@
 
 namespace App;
 
+use App\City;
 use Illuminate\Database\Eloquent\Model;
-
 class Store extends Model
 {
     protected $fillable = [
       'name',
-      'address',
-    ]
+    ];
+
+    public function City()
+    {
+        return $this->belongsTo(City::class);
+    }
 }
