@@ -21,14 +21,14 @@ class ActorsController extends ApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        // return $this->transformer->test();
-        $actors = Actor::all();
-
-        return response()->json([
-          'data' => $this->transformer->transformCollection($actors->toArray())
-        ], 200);
+        $limit = $request->input('limit') ? $request->input('limit') : 10;
+        $actors = Actor::paginate($limit);
+        // $actors = $this->repository->getAll();
+        return $this->responseOk([
+            'actors' => $this->transformer->transformCollection($actors->toArray()),
+        ]);
     }
 
     /**

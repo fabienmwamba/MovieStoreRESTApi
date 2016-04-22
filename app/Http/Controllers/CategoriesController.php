@@ -4,19 +4,38 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Category;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\Transformers\CategoryTransformer;
 
-class CategoriesController extends Controller
+class CategoriesController extends ApiController
 {
+    protected $transformer;
+
+    public function __construct(CategoryTransformer $transformer)
+    {
+        $this->transformer = $transformer;
+    }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $limit = $request->input('limit') ? $request->input('limit') :10;
+
+        $categories = Category::paginate($limit);
+
+        if ($categories == null) {
+          return $this->responseNotFound('Oops no category found');
+          # code...
+        }
+
+        return $this->responseOk([
+            'categories' => $this->transformer->transformCollection($categories->toArray())
+        ]);
     }
 
     /**

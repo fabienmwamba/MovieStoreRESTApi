@@ -8,10 +8,11 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Country;
 use App\Transformers\CountryTransformer;
-class CountriesController extends Controller
-{
 
+class CountriesController extends ApiController
+{
     protected $transformer;
+    protected $transformCity;
 
     public function __construct(CountryTransformer $transformer)
     {
@@ -22,15 +23,16 @@ class CountriesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $countries = Country::all();
+        $limit = $request->input('limit') ? $request->input('limit') : 10;
 
-        return response()->json([
-            'data' => $this->transformer->transformCollection($countries->toArray())
+        $countries = Country::with('cities')->paginate($limit);
+
+        return $this->responseOk([
+            'countries' => $this->transformer->transformCollection($countries->toArray())
         ]);
     }
-
     /**
      * Show the form for creating a new resource.
      *
@@ -52,15 +54,23 @@ class CountriesController extends Controller
         //
     }
 
+
     /**
      * Display the specified resource.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($country)
     {
-        //
+        $country = Country::whereCountry($country)->first();
+
+        if ($country == null) {
+            return $this->responseNotFound('the country you are looking for was not found');
+        }
+        return $this->responseOk([
+          'country' => $this->transformer->transform($country)
+        ]);
     }
 
     /**

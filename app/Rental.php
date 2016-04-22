@@ -6,5 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Rental extends Model
 {
+    protected $fillable = [
+      'rentalDate',
+      'returnDate',
+    ]
     //
 }

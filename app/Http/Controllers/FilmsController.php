@@ -4,19 +4,37 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Film;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\Transformers\FilmTransformer;
 
-class FilmsController extends Controller
+class FilmsController extends ApiController
 {
+    protected $transformer;
+
+    public function __construct(FilmTransformer $transformer)
+    {
+        $this->transformer = $transformer;
+    }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $limit = $request->input('limit') ? $request->input('limit') : 10;
+
+        $films = Film::paginate($limit);
+
+        if ($films == null) {
+          return $this->responseNotFound('no movie found');
+        }
+
+        return $this->responseOk([
+            'films' => $this->transformer->transformCollection($films->toArray())
+        ]);
     }
 
     /**
@@ -48,7 +66,15 @@ class FilmsController extends Controller
      */
     public function show($id)
     {
-        //
+        $film = Film::findOrFail($id);
+
+        if ($film == null) {
+          return $this->responseNotFound('Oops the movie you requested was not found');
+        }
+
+        return $this->responseOk([
+            'film'=> $this->transformer->transform($film)
+        ]);
     }
 
     /**

@@ -50,11 +50,14 @@ $factory->define(App\Address::class, function (Faker\Generator $faker) {
 
 $factory->define(App\Film::class, function (Faker\Generator $faker) {
     return [
-        'address1' => $faker->name,
-        'address2' => $faker->name,
-        'district' => $faker->name,
-        'phone' => $faker->PhoneNumber,
-        'postalCode' => $faker->name,
+        'title' => $faker->sentence,
+        'description' => $faker->paragraph,
+        'releaseYear' => $faker->year,
+        'rentalDuration' => $faker->randomDigit,
+        'rentalRate' => $faker->randomFloat,
+        'length' => $faker->randomDigit,
+        'replacementCost' => $faker->randomFloat,
+        'rating' => $faker->randomLetter,
     ];
 });
 

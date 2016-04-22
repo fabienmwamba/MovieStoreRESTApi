@@ -8,7 +8,7 @@ class ActorTransformer extends Transformer
   public function transform($actor)
   {
       return [
-        'firstname'=>$actor['firstname']
+        'first_name'=>$actor['firstname']
       ];
   }
 }

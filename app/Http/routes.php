@@ -14,6 +14,7 @@
 Route::group(['prefix'=>'api/v1'], function(){
     Route::resource('actors', 'ActorsController');
     Route::resource('countries', 'CountriesController');
+    Route::get('countries/{id}/cities', 'CountriesController@cities');
     Route::resource('cities', 'CitiesController');
     Route::resource('addresses', 'AddressesController');
     Route::resource('languages', 'LanguagesController');
