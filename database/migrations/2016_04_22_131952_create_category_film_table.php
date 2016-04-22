@@ -14,6 +14,8 @@ class CreateCategoryFilmTable extends Migration
     {
         Schema::create('category_film', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('category_id')->unsigned();
+            $table->integer('film_id')->unsigned();
             $table->timestamps();
         });
     }

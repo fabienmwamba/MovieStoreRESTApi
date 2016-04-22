@@ -2,8 +2,9 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Actor;
+use App\Category;
+use Illuminate\Database\Eloquent\Model;
 class Film extends Model
 {
     protected $fillable = [
@@ -20,5 +21,10 @@ class Film extends Model
     public function actors()
     {
         return $this->belongsToMany(Actor::class);
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class);
     }
 }

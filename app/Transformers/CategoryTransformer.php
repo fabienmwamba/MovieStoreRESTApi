@@ -8,7 +8,8 @@ class CategoryTransformer extends Transformer
     public function transform($category)
     {
         return [
-          'category_name' => $category['name']
+          'category_name' => $category['name'],
+          'category_films' => $category['films']
         ];
     }
 }
