@@ -24,7 +24,7 @@ class ActorsController extends ApiController
     public function index(Request $request)
     {
         $limit = $request->input('limit') ? $request->input('limit') : 10;
-        $actors = Actor::paginate($limit);
+        $actors = Actor::with('films')->paginate($limit);
         // $actors = $this->repository->getAll();
         return $this->responseOk([
             'actors' => $this->transformer->transformCollection($actors->toArray()),
@@ -60,8 +60,17 @@ class ActorsController extends ApiController
      */
     public function show($id)
     {
-        $actor = Actor::find($id)->toArray();
-        return $this->transformer->transform($actor);
+        // $actor = Actor::find($id)->toArray();
+        // return $this->transformer->transform($actor);
+        $actor = Actor::findOrFail($id);
+
+        if ($actor == null) {
+          return $this->responseNotFound('Oops the movie you requested was not found');
+        }
+
+        return $this->responseOk([
+            'film'=> $this->transformer->transform($actor)
+        ]);
     }
 
     /**

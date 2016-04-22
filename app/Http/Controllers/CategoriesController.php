@@ -26,7 +26,7 @@ class CategoriesController extends ApiController
     {
         $limit = $request->input('limit') ? $request->input('limit') :10;
 
-        $categories = Category::paginate($limit);
+        $categories = Category::with('films')->paginate($limit);
 
         if ($categories == null) {
           return $this->responseNotFound('Oops no category found');

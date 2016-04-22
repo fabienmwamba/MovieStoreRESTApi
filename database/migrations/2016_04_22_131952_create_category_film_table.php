@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateActorFilmTable extends Migration
+class CreateCategoryFilmTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,10 +12,8 @@ class CreateActorFilmTable extends Migration
      */
     public function up()
     {
-        Schema::create('actor_film', function (Blueprint $table) {
+        Schema::create('category_film', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('actor_id')->unsigned();
-            $table->integer('film_id')->unsigned();
             $table->timestamps();
         });
     }
@@ -27,6 +25,6 @@ class CreateActorFilmTable extends Migration
      */
     public function down()
     {
-        Schema::drop('actor_film');
+        Schema::drop('category_film');
     }
 }

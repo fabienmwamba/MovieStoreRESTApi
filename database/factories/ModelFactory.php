@@ -27,6 +27,13 @@ $factory->define(App\Actor::class, function (Faker\Generator $faker) {
     ];
 });
 
+$factory->define(App\Actor::class, function (Faker\Generator $faker) {
+    return [
+        'firstname' => $faker->firstName,
+        'lastname' => $faker->lastName,
+    ];
+});
+
 $factory->define(App\Country::class, function (Faker\Generator $faker) {
     return [
         'country' => $faker->country,

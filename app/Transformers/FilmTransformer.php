@@ -17,7 +17,8 @@ class FilmTransformer extends Transformer
           'movie_length' => $film['length'],
           'movie_replacementCost' => $film['replacementCost'],
           'movie_rating' => $film['rating'],
-          'movie_title' => $film['title'],
+          'movie_actors' => $film['actors'],
+          'movie_categories' => $film['categories'],
         ];
     }
 }

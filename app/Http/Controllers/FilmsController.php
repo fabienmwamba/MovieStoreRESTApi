@@ -26,7 +26,7 @@ class FilmsController extends ApiController
     {
         $limit = $request->input('limit') ? $request->input('limit') : 10;
 
-        $films = Film::paginate($limit);
+        $films = Film::with('actors, categories')->paginate($limit);
 
         if ($films == null) {
           return $this->responseNotFound('no movie found');
@@ -36,6 +36,8 @@ class FilmsController extends ApiController
             'films' => $this->transformer->transformCollection($films->toArray())
         ]);
     }
+
+
 
     /**
      * Show the form for creating a new resource.
