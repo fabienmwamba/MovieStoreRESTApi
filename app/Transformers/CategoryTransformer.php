@@ -5,6 +5,11 @@ use App\Transformers\Transformer;
 
 class CategoryTransformer extends Transformer
 {
+  /**
+   * Transform the category data
+   *
+   * @return array
+   */
     public function transform($category)
     {
         return [

@@ -4,11 +4,22 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Language;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\Transformers\LanguageTransformer;
 
 class LanguagesContoller extends Controller
 {
+    /**
+     *
+     */
+     protected $transformer;
+
+     public function __construct(LanguageTransformer $transformer)
+     {
+        $this->transformer = $transformer;
+     }
     /**
      * Display a listing of the resource.
      *
@@ -16,7 +27,18 @@ class LanguagesContoller extends Controller
      */
     public function index()
     {
+        return 'index language';
+        // $limit = $request->input('limit') ? $request->input('limit') : 10;
         //
+        // $languages = Language::paginate($limit);
+        //
+        // if ($languages == null) {
+        //   return $this->responseNotFound('no language found');
+        // }
+        //
+        // return $this->responseOk([
+        //   'languages' => $this->transformer->tranformCollection($languages->toArray());
+        // ]);
     }
 
     /**
@@ -26,7 +48,7 @@ class LanguagesContoller extends Controller
      */
     public function create()
     {
-        //
+
     }
 
     /**

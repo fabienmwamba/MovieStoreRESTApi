@@ -11,7 +11,11 @@ use App\City;
 
 class CitiesController extends ApiController
 {
-
+  /**
+   * The data transformer used to tranform the city data.
+   *
+   * @var CityTransformer
+   */
     protected $transformer;
 
     public function __construct(CityTransformer $transformer)
@@ -30,7 +34,9 @@ class CitiesController extends ApiController
         $cities = City::with('addresses', 'stores')->paginate($limit);
 
         return $this->responseOk([
+
             'cities' => $this->transformer->transformCollection($cities->toArray())
+
         ]);
     }
 
@@ -52,7 +58,26 @@ class CitiesController extends ApiController
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, [
+
+          'city' => 'required',
+
+        ]);
+
+        $city = new City();
+
+        $city->city = $request->input('city');
+
+        $city->country_id = $request->input('country_id');
+
+        $city->save();
+
+        return $this->responseOk([
+
+          'message' => 'city created successfully!'
+
+        ]);
+
     }
 
     /**
@@ -61,12 +86,20 @@ class CitiesController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($city)
+    public function show($id)
     {
-        $city = City::whereCity($city)->first();
+        $city = City::find($id);
+
+        if ($city == null) {
+
+          return $this->responseNotFound('the city you are looking for was not found!');
+
+        }
 
         return $this->responseOk([
+
           'city' => $this->transformer->transform($city)
+
         ]);
     }
 
@@ -90,7 +123,17 @@ class CitiesController extends ApiController
      */
     public function update(Request $request, $id)
     {
-        //
+        $city = City::find($id);
+
+        if ($city == null) {
+          return $this->responseNotFound('the city was not found');
+        }
+        $city->city = $request->input('city');
+        $city->save();
+
+        return $this->responseOk([
+          'message' => 'the city was updated successfully'
+        ]);
     }
 
     /**
@@ -101,6 +144,20 @@ class CitiesController extends ApiController
      */
     public function destroy($id)
     {
-        //
+        $city = City::find($id);
+
+        if ($city == null) {
+
+          return $this->responseNotFound('the resource to delete was not found');
+
+        }
+
+        $city->delete();
+
+        return $this->responseOk([
+
+          'message' => 'the city was deleted successfully'
+
+        ]);
     }
 }

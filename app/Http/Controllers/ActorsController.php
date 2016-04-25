@@ -49,7 +49,16 @@ class ActorsController extends ApiController
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, [
+          'firstname' => 'required',
+          'lastname' => 'required',
+        ]);
+
+        Actor::create($request->all());
+
+        return $this->responseOk([
+          'message' => 'actor successfully created',
+        ]);
     }
 
     /**
@@ -62,7 +71,7 @@ class ActorsController extends ApiController
     {
         // $actor = Actor::find($id)->toArray();
         // return $this->transformer->transform($actor);
-        $actor = Actor::findOrFail($id);
+        $actor = Actor::find($id);
 
         if ($actor == null) {
           return $this->responseNotFound('Oops the movie you requested was not found');
@@ -93,7 +102,19 @@ class ActorsController extends ApiController
      */
     public function update(Request $request, $id)
     {
-        //
+        $actor = Actor::find($id);
+
+        if ($actor == null ) {
+          return $this->responseNotFound('actor not found');
+        }
+
+        $actor->firstname = $request->input('firstname');
+        $actor->lastname = $request->input('lastname');
+        $actor->save();
+
+        return $this->responseOk([
+          'message' => 'actor updated successfully'
+        ]);
     }
 
     /**
@@ -104,7 +125,17 @@ class ActorsController extends ApiController
      */
     public function destroy($id)
     {
-        //
+        $actor = Actor::find($id);
+
+        if ($actor == null) {
+          return $this->responseNotFound('actor not found');
+        }
+
+        $actor->delete();
+
+        return $this->responseOk([
+          'message' => 'actor deleted successfully'
+        ]);
     }
 
 

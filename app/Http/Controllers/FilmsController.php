@@ -57,7 +57,23 @@ class FilmsController extends ApiController
      */
     public function store(Request $request)
     {
-        //
+        $film = new Film();
+
+        $film->title = $request->input('title');
+        $film->description = $request->input('description');
+        $film->rentalDuration = $request->input('rentalDuration');
+        $film->rentalRate = $request->input('rentalRate');
+        $film->replacementCost = $request->input('replacementCost');
+        $film->releaseYear = $request->input('releaseYear');
+        $film->length = $request->input('length');
+        $film->rating = $request->input('rating');
+        $film->language_id = $request->input('language_id');
+
+        $film->save();
+
+        return $this->responseOk([
+          'message' => 'Film successfully created'
+        ]);
     }
 
     /**
@@ -68,7 +84,7 @@ class FilmsController extends ApiController
      */
     public function show($id)
     {
-        $film = Film::findOrFail($id);
+        $film = Film::find($id);
 
         if ($film == null) {
           return $this->responseNotFound('Oops the movie you requested was not found');
@@ -99,7 +115,37 @@ class FilmsController extends ApiController
      */
     public function update(Request $request, $id)
     {
-        //
+        $this->validate($request, [
+          'title' => 'required',
+          'description' => 'required',
+          'releaseYear' => 'required',
+          'rentalDuration' => 'required',
+          'rentalRate' => 'required',
+          'length' => 'required',
+          'replacementCost' => 'required',
+          'rating' => 'required',
+        ]);
+
+        $film = Film::find($id);
+
+        if ($film == null) {
+          return $this->responseNotFound('the movie was not found');
+        }
+
+        $film->title = $request->input('title');
+        // $film->description = $request->input('description');
+        // $film->releaseYear = $request->input('releaseYear');
+        // $film->rentalDuration = $request->input('rentalDuration');
+        // $film->rentalRate = $request->input('rentalRate');
+        // $film->length = $request->input('length');
+        // $film->replacementCost = $request->input('replacementCost');
+        // $film->rating = $request->input('rating');
+
+        $film->save();
+
+        return $this->responseOk([
+          'message' => 'film successfully updated'
+        ]);
     }
 
     /**
@@ -110,6 +156,16 @@ class FilmsController extends ApiController
      */
     public function destroy($id)
     {
-        //
+        $film = Film::find($id);
+
+        if ($film == null) {
+          return $this->responseNotFound('the film you are looking for was not found');
+        }
+
+        $film->delete();
+
+        return $this->responseOk([
+          'message' => 'film successfully deleted'
+        ]);
     }
 }

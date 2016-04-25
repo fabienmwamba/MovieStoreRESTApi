@@ -8,10 +8,22 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Country;
 use App\Transformers\CountryTransformer;
+use App\Http\Requests\CountryRequest;
 
 class CountriesController extends ApiController
 {
+  /**
+   * The data transformer used to tranform the country data.
+   *
+   * @var CountryTransformer
+   */
     protected $transformer;
+
+    /**
+     * The data transformer used to tranform the city data.
+     *
+     * @var CityTransformer
+     */
     protected $transformCity;
 
     public function __construct(CountryTransformer $transformer)
@@ -30,7 +42,9 @@ class CountriesController extends ApiController
         $countries = Country::with('cities')->paginate($limit);
 
         return $this->responseOk([
+
             'countries' => $this->transformer->transformCollection($countries->toArray())
+            
         ]);
     }
     /**
@@ -49,9 +63,25 @@ class CountriesController extends ApiController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CountryRequest $request)
     {
-        //
+        //validate request
+        //save the country to the databse
+        //return response
+        // $this->validate($request, ['country'=>'required']);
+        if (Country::create($request->all())) {
+
+          return $this->responseOk([
+
+            'message' => 'Country created'
+
+          ]);
+
+        };
+
+        return 'error';
+
+
     }
 
 
@@ -61,15 +91,20 @@ class CountriesController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($country)
+    public function show($id)
     {
-        $country = Country::whereCountry($country)->first();
+        $country = Country::find($id);
 
         if ($country == null) {
+
             return $this->responseNotFound('the country you are looking for was not found');
+
         }
+
         return $this->responseOk([
+
           'country' => $this->transformer->transform($country)
+
         ]);
     }
 
@@ -81,7 +116,7 @@ class CountriesController extends ApiController
      */
     public function edit($id)
     {
-        //
+
     }
 
     /**
@@ -91,9 +126,19 @@ class CountriesController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(CountryRequest $request, $id)
     {
-        //
+        $country = Country::find($id);
+
+        $country->country = $request->input('country');
+
+        $country->save();
+
+        return $this->responseOk([
+
+          'message'=> 'Country updated successfully',
+
+        ]);
     }
 
     /**
@@ -104,6 +149,20 @@ class CountriesController extends ApiController
      */
     public function destroy($id)
     {
-        //
+        $country = Country::find($id);
+
+        if ($country == null) {
+
+          return $this->responseNotFound('could not find the cound try with id ' . $id);
+
+        }
+
+        $country->delete();
+
+        return $this->responseOk([
+
+          'message' => 'Country deleted successfully',
+
+        ]);
     }
 }

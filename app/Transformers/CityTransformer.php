@@ -5,6 +5,11 @@ use App\Transformers\Transformer;
 
 class CityTransformer extends Transformer
 {
+  /**
+   * Transform the city's data
+   *
+   * @return array
+   */
     public function transform($city)
     {
         return [

@@ -11,6 +11,11 @@ use App\Transformers\CategoryTransformer;
 
 class CategoriesController extends ApiController
 {
+  /**
+   * The data transformer used to transform data
+   *
+   * @var CategoryTransformer
+   */
     protected $transformer;
 
     public function __construct(CategoryTransformer $transformer)
@@ -56,7 +61,13 @@ class CategoriesController extends ApiController
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, ['name'=>'required']);
+
+        Category::create($request->all());
+
+        return $this->responseOk([
+          'message' => 'category successfully created',
+        ]);
     }
 
     /**
@@ -67,7 +78,15 @@ class CategoriesController extends ApiController
      */
     public function show($id)
     {
-        //
+        $category = Category::find($id);
+
+        if ($category == null) {
+          return $this->responseNotFound('category not found!');
+        }
+
+        return $this->responseOk([
+          'category' => $this->transformer->transform($category)
+        ]);
     }
 
     /**
@@ -90,7 +109,20 @@ class CategoriesController extends ApiController
      */
     public function update(Request $request, $id)
     {
-        //
+        $this->validate($request, ['name'=>'required']);
+        $category = Category::find($id);
+
+        if ($category == null) {
+          return $this->responseNotFound('category not found');
+        }
+
+        $category->name = $request->input('name');
+
+        $category->save();
+
+        return $this->responseOk([
+          'message' => 'category successfully updated'
+        ]);
     }
 
     /**
@@ -101,6 +133,15 @@ class CategoriesController extends ApiController
      */
     public function destroy($id)
     {
-        //
+        $category = Category::find($id);
+
+        if ($category == null) {
+          return $this->responseNotFound('category not found');
+        }
+        $category->delete();
+
+        return $this->responseOk([
+          'message' => 'category successfully deleted'
+        ]);
     }
 }

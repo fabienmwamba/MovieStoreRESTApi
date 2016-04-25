@@ -5,6 +5,11 @@ use App\Transformers\Transformer;
 
 class CountryTransformer extends Transformer
 {
+  /**
+   * transform the the country's data.
+   *
+   * @return Array
+   */
     public function transform($country)
     {
         return [
