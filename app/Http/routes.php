@@ -11,7 +11,7 @@
 |
 */
 
-Route::group(['prefix'=>'api/v1'], function(){
+Route::group(['middleware'=>'cors', 'prefix'=>'api/v1'], function(){
     Route::resource('actors', 'ActorsController');
     Route::resource('countries', 'CountriesController');
     Route::get('countries/{id}/cities', 'CountriesController@cities');
