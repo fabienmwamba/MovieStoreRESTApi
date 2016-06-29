@@ -56,21 +56,7 @@ class StoreRepository extends Transformer implements Repository
      */
     public function update($request, $id)
     {
-        $store = Store::find($id);
-
-        if (! $store) {
-            return false;
-        }
-
-        try {
-          $store->firstname = $request->input('firstname');
-          $store->lastname = $request->input('lastname');
-          $store->save();
-        } catch (Exception $e) {
-          //TODO cathc and log the exception for future reference and debugging
-        }
-
-        return true;
+      //TODO:: to be implemented
     }
 
     /**

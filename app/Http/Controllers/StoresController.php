@@ -10,11 +10,11 @@ use App\Repositories\StoreRepository;
 
 class StoresController extends ApiController
 {
-    protected $transformer;
+    protected $repository;
 
-    public function __construct(StoreTransformer $transformer)
+    public function __construct(StoreRepository $repository)
     {
-        $this->transformer = $transformer;
+        $this->repository = $repository;
     }
     /**
      * Display a listing of the resource.
@@ -23,20 +23,9 @@ class StoresController extends ApiController
      */
     public function index(Request $request)
     {
-        // $limit = $request->input('limit') ? $request->input('limit') : 10;
-        //
-        // $stores = Store::paginate($limit);
-        //
-        // if ($stores == null) {
-        //     return $this->responseNotFound('No Store found');
-        // }
-        //
-        // return $this->responseOk([
-        //   'stores' => $this->transformer->transformCollection($stores->toArray())
-        // ]);
         $limit = $request->input('limit');
 
-        $actors = $this->repository->getAll($limit);
+        $stores = $this->repository->getAll($limit);
 
         return $this->responseOk([
             'message' => 'success',
@@ -52,7 +41,15 @@ class StoresController extends ApiController
      */
     public function store(Request $request)
     {
-        //TODO
+        $store = $this->repository->add($request);
+
+        if (! $store) {
+            return 'could not create resource';
+        }
+
+        return $this->responseOk([
+          'message' => 'store successfully created',
+        ]);
     }
 
     /**
@@ -63,14 +60,15 @@ class StoresController extends ApiController
      */
     public function show($storeId)
     {
-        $store = Store::findOrFail($storeId);
+        $store = $this->repository->getById($storeId);
 
-        if ($store == null) {
-            return $this->responseNotFound('the specified store was not found');
+        if (! $store) {
+          return $this->responseNotFound('Oops the actor was not found');
         }
 
         return $this->responseOk([
-            'store'=>$this->transformer->transform($store)
+          'message' => 'success',
+          'actor' => $store
         ]);
     }
 
@@ -94,14 +92,14 @@ class StoresController extends ApiController
      */
     public function destroy($storeId)
     {
-        $actor = $this->repository->delete($ActorId);
+        $store = $this->repository->delete($storeId);
 
-        if (! $actor) {
-          return 'coul not delete actor';
+        if (! $store) {
+          return 'coul not delete movie';
         }
 
         return $this->responseOk([
-          'message' => 'actor deleted successfully'
+          'message' => 'movie deleted successfully'
         ]);
     }
 }

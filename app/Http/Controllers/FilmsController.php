@@ -4,18 +4,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Film;
+use App\Models\Film;
 use App\Http\Requests;
+use App\Http\Requests\FilmRequest;
 use App\Http\Controllers\Controller;
-use App\Transformers\FilmTransformer;
+use App\Repositories\FilmRepository;
 
 class FilmsController extends ApiController
 {
-    protected $transformer;
+    protected $repository;
 
-    public function __construct(FilmTransformer $transformer)
+    public function __construct(FilmRepository $repository)
     {
-        $this->transformer = $transformer;
+        $this->repository = $repository;
     }
     /**
      * Display a listing of the resource.
@@ -24,29 +25,14 @@ class FilmsController extends ApiController
      */
     public function index(Request $request)
     {
-        $limit = $request->input('limit') ? $request->input('limit') : 10;
+        $limit = $request->input('limit');
 
-        $films = Film::with('actors', 'categories')->paginate($limit);
-
-        if ($films == null) {
-          return $this->responseNotFound('no movie found');
-        }
+        $films = $this->repository->getAll($limit);
 
         return $this->responseOk([
-            'films' => $this->transformer->transformCollection($films->toArray())
+            'message' => 'success',
+            'actors' => $films,
         ]);
-    }
-
-
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -55,24 +41,16 @@ class FilmsController extends ApiController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(FilmRequest $request)
     {
-        $film = new Film();
+        $film = $this->repository->add($request);
 
-        $film->title = $request->input('title');
-        $film->description = $request->input('description');
-        $film->rentalDuration = $request->input('rentalDuration');
-        $film->rentalRate = $request->input('rentalRate');
-        $film->replacementCost = $request->input('replacementCost');
-        $film->releaseYear = $request->input('releaseYear');
-        $film->length = $request->input('length');
-        $film->rating = $request->input('rating');
-        $film->language_id = $request->input('language_id');
-
-        $film->save();
+        if (! $film) {
+            return 'could not create resource';
+        }
 
         return $this->responseOk([
-          'message' => 'Film successfully created'
+          'message' => 'movie successfully created',
         ]);
     }
 
@@ -82,28 +60,18 @@ class FilmsController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($filmId)
     {
-        $film = Film::find($id);
+        $film = $this->repository->getById($filmId);
 
-        if ($film == null) {
-          return $this->responseNotFound('Oops the movie you requested was not found');
+        if (! $film) {
+          return $this->responseNotFound('Oops the movie was not found');
         }
 
         return $this->responseOk([
-            'film'=> $this->transformer->transform($film)
+          'message' => 'success',
+          'actor' => $film
         ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
     }
 
     /**
@@ -113,39 +81,9 @@ class FilmsController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $filmId)
     {
-        $this->validate($request, [
-          'title' => 'required',
-          'description' => 'required',
-          'releaseYear' => 'required',
-          'rentalDuration' => 'required',
-          'rentalRate' => 'required',
-          'length' => 'required',
-          'replacementCost' => 'required',
-          'rating' => 'required',
-        ]);
-
-        $film = Film::find($id);
-
-        if ($film == null) {
-          return $this->responseNotFound('the movie was not found');
-        }
-
-        $film->title = $request->input('title');
-        // $film->description = $request->input('description');
-        // $film->releaseYear = $request->input('releaseYear');
-        // $film->rentalDuration = $request->input('rentalDuration');
-        // $film->rentalRate = $request->input('rentalRate');
-        // $film->length = $request->input('length');
-        // $film->replacementCost = $request->input('replacementCost');
-        // $film->rating = $request->input('rating');
-
-        $film->save();
-
-        return $this->responseOk([
-          'message' => 'film successfully updated'
-        ]);
+        //TODO: implemts update method
     }
 
     /**
@@ -154,18 +92,16 @@ class FilmsController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($filmId)
     {
-        $film = Film::find($id);
+        $film = $this->repository->delete($filmId);
 
-        if ($film == null) {
-          return $this->responseNotFound('the film you are looking for was not found');
+        if (! $film) {
+          return 'coul not delete actor';
         }
 
-        $film->delete();
-
         return $this->responseOk([
-          'message' => 'film successfully deleted'
+          'message' => 'movie deleted successfully'
         ]);
     }
 }

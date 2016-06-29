@@ -53,9 +53,9 @@ class AddressesController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($AddressId)
+    public function show($addressId)
     {
-        $address = $this->repository->getById($AddressId);
+        $address = $this->repository->getById($addressId);
 
         if (! $address) {
           return $this->responseNotFound('Oops the address was not found');
@@ -85,9 +85,9 @@ class AddressesController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($AddressId)
+    public function destroy($addressId)
     {
-        $address = $this->repository->delete($AddressId);
+        $address = $this->repository->delete($addressId);
 
         if (! $address) {
           return 'coul not delete address';

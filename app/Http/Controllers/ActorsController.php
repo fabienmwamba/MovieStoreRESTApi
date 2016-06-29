@@ -64,9 +64,9 @@ class ActorsController extends ApiController
      * @param  int  $ActorId
      * @return \Illuminate\Http\Response
      */
-    public function show($ActorId)
+    public function show($actorId)
     {
-        $actor = $this->repository->getById($ActorId);
+        $actor = $this->repository->getById($actorId);
 
         if (! $actor) {
           return $this->responseNotFound('Oops the actor was not found');

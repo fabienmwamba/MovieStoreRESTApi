@@ -112,21 +112,6 @@ class CitiesController extends ApiController
      */
     public function destroy($cityId)
     {
-        // $city = City::find($id);
-        //
-        // if ($city == null) {
-        //
-        //   return $this->responseNotFound('the resource to delete was not found');
-        //
-        // }
-        //
-        // $city->delete();
-        //
-        // return $this->responseOk([
-        //
-        //   'message' => 'the city was deleted successfully'
-        //
-        // ]);
         $city = $this->repository->delete($cityId);
 
         if (! $city) {

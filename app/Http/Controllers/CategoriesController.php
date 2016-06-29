@@ -76,9 +76,9 @@ class CategoriesController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($CategoryId)
+    public function show($categoryId)
     {
-        $category = $this->repository->getById($CategoryId);
+        $category = $this->repository->getById($categoryId);
 
         if (! $category) {
           return $this->responseNotFound('Oops the category was not found');
@@ -97,7 +97,7 @@ class CategoriesController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $CategoryId)
+    public function update(Request $request, $categoryId)
     {
         $this->validate($request, ['name'=>'required']);
         $category = Category::find($id);
@@ -121,9 +121,9 @@ class CategoriesController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($CategoryId)
+    public function destroy($categoryId)
     {
-        $category = $this->repository->delete($CategoryId);
+        $category = $this->repository->delete($categoryId);
 
         if (! $category) {
           return 'coul not delete actor';

@@ -18,9 +18,9 @@ class FilmRepository extends Transformer implements Repository
     {
         $limit = $perPage ? $perPage : SELF::PER_PAGE;
 
-        $actors = Film::with('actors', 'categories')->paginate($limit);
+        $films = Film::with('actors', 'categories')->paginate($limit);
 
-        return $this->transformCollection($actors->toArray());
+        return $this->transformCollection($films->toArray());
     }
     /**
      * Get an actor by his ID
@@ -29,13 +29,13 @@ class FilmRepository extends Transformer implements Repository
      */
     public function getById($id)
     {
-        $actor = Film::find($id);
+        $film = Film::find($id);
 
-        if ($actor == null) {
+        if ($film == null) {
             return false;
         }
 
-        return $this->transform($actor);
+        return $this->transform($film);
     }
 
     /**
@@ -45,7 +45,21 @@ class FilmRepository extends Transformer implements Repository
      */
     public function add($request)
     {
-        return Film::create($request->all());
+        try {
+          $film = new Film();
+          $film->title = $request->input('title');
+          $film->description = $request->input('description');
+          $film->rentalDuration = $request->input('rentalDuration');
+          $film->rentalRate = $request->input('rentalRate');
+          $film->replacementCost = $request->input('replacementCost');
+          $film->releaseYear = $request->input('releaseYear');
+          $film->length = $request->input('length');
+          $film->rating = $request->input('rating');
+          $film->language_id = $request->input('language_id');
+          return true;
+        } catch (Exception $e) {
+          //TODO: catch and log exception for further reference
+        }
 
     }
 
@@ -56,16 +70,16 @@ class FilmRepository extends Transformer implements Repository
      */
     public function update($request, $id)
     {
-        $actor = Film::find($id);
+        $film = Film::find($id);
 
-        if (! $actor) {
+        if (! $film) {
             return false;
         }
 
         try {
-          $actor->firstname = $request->input('firstname');
-          $actor->lastname = $request->input('lastname');
-          $actor->save();
+          $film->firstname = $request->input('firstname');
+          $film->lastname = $request->input('lastname');
+          $film->save();
         } catch (Exception $e) {
           //TODO cathc and log the exception for future reference and debugging
         }
@@ -77,12 +91,20 @@ class FilmRepository extends Transformer implements Repository
      *  Transformer the return field instead of returning table field
      *
      */
-    public function transform($actor)
+    public function transform($film)
     {
         return [
-          'first_name'=>$actor['firstname'],
-          'last_name'=>$actor['lastname'],
-          'actor_films'=> $actor['films'],
+          'id' => $film['id'],
+          'movie_title' => $film['title'],
+          'movie_description' => $film['description'],
+          'movie_releaseYear' => $film['releaseYear'],
+          'movie_rentalDuration' => $film['rentalDuration'],
+          'movie_rentalRate' => $film['rentalRate'],
+          'movie_length' => $film['length'],
+          'movie_replacementCost' => $film['replacementCost'],
+          'movie_rating' => $film['rating'],
+          'movie_actors' => $film['actors'],
+          'movie_categories' => $film['categories'],
         ];
     }
 
@@ -92,14 +114,14 @@ class FilmRepository extends Transformer implements Repository
      */
     public function delete($id)
     {
-        $actor = Film::find($id);
+        $film = Film::find($id);
 
-        if ($actor == null ) {
+        if ($film == null ) {
             return false;
         }
 
         try {
-          $actor->delete();
+          $film->delete();
         } catch (Exception $e) {
           //TODO catch and log exception for future reference
         }

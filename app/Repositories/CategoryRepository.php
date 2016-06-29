@@ -56,21 +56,7 @@ class CategoryRepository extends Transformer implements Repository
      */
     public function update($request, $id)
     {
-        $category = Category::find($id);
-
-        if (! $category) {
-            return false;
-        }
-
-        try {
-          $category->firstname = $request->input('firstname');
-          $category->lastname = $request->input('lastname');
-          $category->save();
-        } catch (Exception $e) {
-          //TODO cathc and log the exception for future reference and debugging
-        }
-
-        return true;
+      //TODO: to be implemented
     }
 
     /**

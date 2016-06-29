@@ -56,21 +56,7 @@ class ActorRepository extends Transformer implements Repository
      */
     public function update($request, $id)
     {
-        $actor = Actor::find($id);
-
-        if (! $actor) {
-            return false;
-        }
-
-        try {
-          $actor->firstname = $request->input('firstname');
-          $actor->lastname = $request->input('lastname');
-          $actor->save();
-        } catch (Exception $e) {
-          //TODO cathc and log the exception for future reference and debugging
-        }
-
-        return true;
+      //TODO: to be implemented
     }
 
     /**

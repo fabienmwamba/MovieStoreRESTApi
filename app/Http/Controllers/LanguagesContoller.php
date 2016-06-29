@@ -27,18 +27,7 @@ class LanguagesContoller extends Controller
      */
     public function index()
     {
-        return 'index language';
-        // $limit = $request->input('limit') ? $request->input('limit') : 10;
-        //
-        // $languages = Language::paginate($limit);
-        //
-        // if ($languages == null) {
-        //   return $this->responseNotFound('no language found');
-        // }
-        //
-        // return $this->responseOk([
-        //   'languages' => $this->transformer->tranformCollection($languages->toArray());
-        // ]);
+
     }
 
     /**
