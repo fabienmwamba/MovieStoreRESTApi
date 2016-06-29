@@ -50,19 +50,6 @@ class CitiesController extends ApiController
           'city' => 'required',
         ]);
 
-        // $city = new City();
-        //
-        // $city->city = $request->input('city');
-        //
-        // $city->country_id = $request->input('country_id');
-        //
-        // $city->save();
-        //
-        // return $this->responseOk([
-        //
-        //   'message' => 'city created successfully!'
-        //
-        // ]);
         $city = $this->repository->add($request);
 
         if (! $city) {
