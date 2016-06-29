@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 use App\Http\Requests;
+use App\Models\Country;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Country;
-use App\Transformers\CountryTransformer;
+use App\Repositories\CountryRepository;
 use App\Http\Requests\CountryRequest;
 
 class CountriesController extends ApiController
@@ -17,18 +16,12 @@ class CountriesController extends ApiController
    *
    * @var CountryTransformer
    */
-    protected $transformer;
+    protected $repository;
 
-    /**
-     * The data transformer used to tranform the city data.
-     *
-     * @var CityTransformer
-     */
-    protected $transformCity;
 
-    public function __construct(CountryTransformer $transformer)
+    public function __construct(CountryRepository $repository)
     {
-        $this->transformer = $transformer;
+        $this->repository = $repository;
     }
     /**
      * Display a listing of the resource.
@@ -37,14 +30,13 @@ class CountriesController extends ApiController
      */
     public function index(Request $request)
     {
-        $limit = $request->input('limit') ? $request->input('limit') : 10;
+        $limit = $request->input('limit');
 
-        $countries = Country::with('cities')->paginate($limit);
+        $countries = $this->repository->getAll($limit);
 
         return $this->responseOk([
-
-            'countries' => $this->transformer->transformCollection($countries->toArray())
-            
+            'message' => 'success',
+            'countries' => $countries,
         ]);
     }
     /**
@@ -65,23 +57,15 @@ class CountriesController extends ApiController
      */
     public function store(CountryRequest $request)
     {
-        //validate request
-        //save the country to the databse
-        //return response
-        // $this->validate($request, ['country'=>'required']);
-        if (Country::create($request->all())) {
+        $country = $this->repository->add($request);
 
-          return $this->responseOk([
+        if (! $country) {
+            return 'could not create resource';
+        }
 
-            'message' => 'Country created'
-
-          ]);
-
-        };
-
-        return 'error';
-
-
+        return $this->responseOk([
+          'message' => 'country successfully created',
+        ]);
     }
 
 
@@ -91,32 +75,18 @@ class CountriesController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($countryId)
     {
-        $country = Country::find($id);
+        $country = $this->repository->getById($countryId);
 
-        if ($country == null) {
-
-            return $this->responseNotFound('the country you are looking for was not found');
-
+        if (! $country) {
+          return $this->responseNotFound('Oops the actor was not found');
         }
 
         return $this->responseOk([
-
-          'country' => $this->transformer->transform($country)
-
+          'message' => 'success',
+          'actor' => $country
         ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-
     }
 
     /**
@@ -128,17 +98,7 @@ class CountriesController extends ApiController
      */
     public function update(CountryRequest $request, $id)
     {
-        $country = Country::find($id);
-
-        $country->country = $request->input('country');
-
-        $country->save();
-
-        return $this->responseOk([
-
-          'message'=> 'Country updated successfully',
-
-        ]);
+        //TODO: to be implemented
     }
 
     /**
@@ -147,22 +107,16 @@ class CountriesController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($countryId)
     {
-        $country = Country::find($id);
+        $country = $this->repository->delete($countryId);
 
-        if ($country == null) {
-
-          return $this->responseNotFound('could not find the cound try with id ' . $id);
-
+        if (! $country) {
+          return 'coul not delete actor';
         }
 
-        $country->delete();
-
         return $this->responseOk([
-
-          'message' => 'Country deleted successfully',
-
+          'message' => 'actor deleted successfully'
         ]);
     }
 }

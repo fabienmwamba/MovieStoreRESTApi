@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
+use App\Models\City;
 use App\Http\Requests;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Transformers\CityTransformer;
-use App\City;
+use App\Repositories\CityRepository;
 
 class CitiesController extends ApiController
 {
@@ -16,11 +15,11 @@ class CitiesController extends ApiController
    *
    * @var CityTransformer
    */
-    protected $transformer;
+    protected $repository;
 
-    public function __construct(CityTransformer $transformer)
+    public function __construct(CityRepository $repository)
     {
-        $this->transformer = $transformer;
+        $this->repository = $repository;
     }
     /**
      * Display a listing of the resource.
@@ -29,25 +28,14 @@ class CitiesController extends ApiController
      */
     public function index(Request $request)
     {
-        $limit = $request->input('limit') ? $request->input('limit') : 10;
+        $limit = $request->input('limit');
 
-        $cities = City::with('addresses', 'stores')->paginate($limit);
+        $cities = $this->repository->getAll($limit);
 
         return $this->responseOk([
-
-            'cities' => $this->transformer->transformCollection($cities->toArray())
-
+            'message' => 'success',
+            'actors' => $cities,
         ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -59,23 +47,30 @@ class CitiesController extends ApiController
     public function store(Request $request)
     {
         $this->validate($request, [
-
           'city' => 'required',
-
         ]);
 
-        $city = new City();
+        // $city = new City();
+        //
+        // $city->city = $request->input('city');
+        //
+        // $city->country_id = $request->input('country_id');
+        //
+        // $city->save();
+        //
+        // return $this->responseOk([
+        //
+        //   'message' => 'city created successfully!'
+        //
+        // ]);
+        $city = $this->repository->add($request);
 
-        $city->city = $request->input('city');
-
-        $city->country_id = $request->input('country_id');
-
-        $city->save();
+        if (! $city) {
+            return 'could not create resource';
+        }
 
         return $this->responseOk([
-
-          'message' => 'city created successfully!'
-
+          'message' => 'actor successfully created',
         ]);
 
     }
@@ -86,32 +81,18 @@ class CitiesController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($cityId)
     {
-        $city = City::find($id);
+        $city = $this->repository->getById($cityId);
 
-        if ($city == null) {
-
-          return $this->responseNotFound('the city you are looking for was not found!');
-
+        if (! $city) {
+          return $this->responseNotFound('Oops the city was not found');
         }
 
         return $this->responseOk([
-
-          'city' => $this->transformer->transform($city)
-
+          'message' => 'success',
+          'city' => $city
         ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
     }
 
     /**
@@ -142,22 +123,31 @@ class CitiesController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($cityId)
     {
-        $city = City::find($id);
+        // $city = City::find($id);
+        //
+        // if ($city == null) {
+        //
+        //   return $this->responseNotFound('the resource to delete was not found');
+        //
+        // }
+        //
+        // $city->delete();
+        //
+        // return $this->responseOk([
+        //
+        //   'message' => 'the city was deleted successfully'
+        //
+        // ]);
+        $city = $this->repository->delete($cityId);
 
-        if ($city == null) {
-
-          return $this->responseNotFound('the resource to delete was not found');
-
+        if (! $city) {
+          return 'coul not delete actor';
         }
 
-        $city->delete();
-
         return $this->responseOk([
-
-          'message' => 'the city was deleted successfully'
-
+          'message' => 'city deleted successfully'
         ]);
     }
 }

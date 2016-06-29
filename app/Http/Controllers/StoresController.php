@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
 use App\Store;
-use App\Transformers\StoreTransformer;
+use App\Http\Requests;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Repositories\StoreRepository;
 
 class StoresController extends ApiController
 {
@@ -24,27 +23,25 @@ class StoresController extends ApiController
      */
     public function index(Request $request)
     {
-        $limit = $request->input('limit') ? $request->input('limit') : 10;
+        // $limit = $request->input('limit') ? $request->input('limit') : 10;
+        //
+        // $stores = Store::paginate($limit);
+        //
+        // if ($stores == null) {
+        //     return $this->responseNotFound('No Store found');
+        // }
+        //
+        // return $this->responseOk([
+        //   'stores' => $this->transformer->transformCollection($stores->toArray())
+        // ]);
+        $limit = $request->input('limit');
 
-        $stores = Store::paginate($limit);
-
-        if ($stores == null) {
-            return $this->responseNotFound('No Store found');
-        }
+        $actors = $this->repository->getAll($limit);
 
         return $this->responseOk([
-          'stores' => $this->transformer->transformCollection($stores->toArray())
+            'message' => 'success',
+            'stores' => $stores,
         ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -55,7 +52,7 @@ class StoresController extends ApiController
      */
     public function store(Request $request)
     {
-        //
+        //TODO
     }
 
     /**
@@ -64,9 +61,9 @@ class StoresController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($storeId)
     {
-        $store = Store::findOrFail($id);
+        $store = Store::findOrFail($storeId);
 
         if ($store == null) {
             return $this->responseNotFound('the specified store was not found');
@@ -78,17 +75,6 @@ class StoresController extends ApiController
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -97,7 +83,7 @@ class StoresController extends ApiController
      */
     public function update(Request $request, $id)
     {
-        //
+        //TODO
     }
 
     /**
@@ -106,8 +92,16 @@ class StoresController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($storeId)
     {
-        //
+        $actor = $this->repository->delete($ActorId);
+
+        if (! $actor) {
+          return 'coul not delete actor';
+        }
+
+        return $this->responseOk([
+          'message' => 'actor deleted successfully'
+        ]);
     }
 }

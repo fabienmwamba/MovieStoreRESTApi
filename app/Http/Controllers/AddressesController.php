@@ -4,18 +4,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Address;
 use App\Http\Requests;
+use App\Models\Address;
 use App\Http\Controllers\Controller;
+use App\Repositories\AddressRepository;
 use App\Transformers\AddressTransformer;
 
 class AddressesController extends ApiController
 {
-    protected $transformer;
+    protected $repository;
 
-    public function __construct(AddressTransformer $transformer)
+    public function __construct(AddressRepository $repository)
     {
-        $this->transformer = $transformer;
+        $this->repository = $repository;
     }
     /**
      * Display a listing of the resource.
@@ -24,26 +25,15 @@ class AddressesController extends ApiController
      */
     public function index(Request $request)
     {
-        $limit = $request->input('limit') ? $request->input('limit') : 10;
-        $addresses = Address::paginate($limit);
-        if ($addresses == null) {
-          return $this->responseNotFound('address not found');
-        }
+        $limit = $request->input('limit');
+
+        $addresses = $this->repository->getAll($limit);
 
         return $this->responseOk([
-          'addresses' => $this->transformer->transformCollection($addresses->toArray())
+            'message' => 'success',
+            'actors' => $addresses,
         ]);
 
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -54,7 +44,7 @@ class AddressesController extends ApiController
      */
     public function store(Request $request)
     {
-        //
+        //TODO Implement
     }
 
     /**
@@ -63,27 +53,18 @@ class AddressesController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($AddressId)
     {
-        $address = Address::findOrFail($id);
+        $address = $this->repository->getById($AddressId);
 
-        if ($address == null) {
-          return $this->responseNotFound('address not found');
+        if (! $address) {
+          return $this->responseNotFound('Oops the address was not found');
         }
-        return $this->responseOk([
-          'address' => $this->transformer->transform($address)
-        ]);
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        return $this->responseOk([
+          'message' => 'success',
+          'actor' => $address
+        ]);
     }
 
     /**
@@ -104,8 +85,16 @@ class AddressesController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($AddressId)
     {
-        //
+        $address = $this->repository->delete($AddressId);
+
+        if (! $address) {
+          return 'coul not delete address';
+        }
+
+        return $this->responseOk([
+          'message' => 'address deleted successfully'
+        ]);
     }
 }

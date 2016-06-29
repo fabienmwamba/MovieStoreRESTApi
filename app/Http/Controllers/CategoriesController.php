@@ -2,25 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 
-use App\Category;
 use App\Http\Requests;
+use App\Models\Category;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Transformers\CategoryTransformer;
+use App\Repositories\CategoryRepository;
 
 class CategoriesController extends ApiController
 {
   /**
-   * The data transformer used to transform data
+   * The Hold the category's repository
    *
-   * @var CategoryTransformer
+   * @var mixed
    */
-    protected $transformer;
+    protected $repository;
 
-    public function __construct(CategoryTransformer $transformer)
+    public function __construct(CategoryRepository $repository)
     {
-        $this->transformer = $transformer;
+        $this->repository = $repository;
     }
     /**
      * Display a listing of the resource.
@@ -29,17 +29,13 @@ class CategoriesController extends ApiController
      */
     public function index(Request $request)
     {
-        $limit = $request->input('limit') ? $request->input('limit') :10;
+        $limit = $request->input('limit');
 
-        $categories = Category::with('films')->paginate($limit);
-
-        if ($categories == null) {
-          return $this->responseNotFound('Oops no category found');
-          # code...
-        }
+        $categories = $this->repository->getAll($limit);
 
         return $this->responseOk([
-            'categories' => $this->transformer->transformCollection($categories->toArray())
+            'message' => 'success',
+            'actors' => $categories,
         ]);
     }
 
@@ -63,7 +59,11 @@ class CategoriesController extends ApiController
     {
         $this->validate($request, ['name'=>'required']);
 
-        Category::create($request->all());
+        $category = $this->repository->add($request);
+
+        if (! $category) {
+            return 'could not create resource';
+        }
 
         return $this->responseOk([
           'message' => 'category successfully created',
@@ -76,28 +76,18 @@ class CategoriesController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($CategoryId)
     {
-        $category = Category::find($id);
+        $category = $this->repository->getById($CategoryId);
 
-        if ($category == null) {
-          return $this->responseNotFound('category not found!');
+        if (! $category) {
+          return $this->responseNotFound('Oops the category was not found');
         }
 
         return $this->responseOk([
-          'category' => $this->transformer->transform($category)
+          'message' => 'success',
+          'actor' => $category
         ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
     }
 
     /**
@@ -107,7 +97,7 @@ class CategoriesController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $CategoryId)
     {
         $this->validate($request, ['name'=>'required']);
         $category = Category::find($id);
@@ -131,17 +121,16 @@ class CategoriesController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($CategoryId)
     {
-        $category = Category::find($id);
+        $category = $this->repository->delete($CategoryId);
 
-        if ($category == null) {
-          return $this->responseNotFound('category not found');
+        if (! $category) {
+          return 'coul not delete actor';
         }
-        $category->delete();
 
         return $this->responseOk([
-          'message' => 'category successfully deleted'
+          'message' => 'category deleted successfully'
         ]);
     }
 }

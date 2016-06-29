@@ -2,19 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Actor;
+use App\Models\Actor;
 use App\Http\Requests;
 use Illuminate\Http\Request;
+use App\Http\Requests\ActorRequest;
 use App\Http\Controllers\Controller;
-use App\Transformers\ActorTransformer;
+use App\Repositories\ActorRepository;
 
 class ActorsController extends ApiController
 {
-    protected $transformer;
+    /**
+     *  the actor's repository
+     *
+     *  @var mixed
+     */
+    protected $repository;
 
-    public function __construct(ActorTransformer $transformer)
+    public function __construct(ActorRepository $repository)
     {
-        $this->transformer = $transformer;
+        $this->repository = $repository;
     }
     /**
      * Display a listing of the resource.
@@ -23,22 +29,14 @@ class ActorsController extends ApiController
      */
     public function index(Request $request)
     {
-        $limit = $request->input('limit') ? $request->input('limit') : 10;
-        $actors = Actor::with('films')->paginate($limit);
-        // $actors = $this->repository->getAll();
-        return $this->responseOk([
-            'actors' => $this->transformer->transformCollection($actors->toArray()),
-        ]);
-    }
+        $limit = $request->input('limit');
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        $actors = $this->repository->getAll($limit);
+
+        return $this->responseOk([
+            'message' => 'success',
+            'actors' => $actors,
+        ]);
     }
 
     /**
@@ -47,14 +45,13 @@ class ActorsController extends ApiController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ActorRequest $request)
     {
-        $this->validate($request, [
-          'firstname' => 'required',
-          'lastname' => 'required',
-        ]);
+        $actor = $this->repository->add($request);
 
-        Actor::create($request->all());
+        if (! $actor) {
+            return 'could not create resource';
+        }
 
         return $this->responseOk([
           'message' => 'actor successfully created',
@@ -64,45 +61,38 @@ class ActorsController extends ApiController
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int  $ActorId
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($ActorId)
     {
-        // $actor = Actor::find($id)->toArray();
-        // return $this->transformer->transform($actor);
-        $actor = Actor::find($id);
+        $actor = $this->repository->getById($ActorId);
 
-        if ($actor == null) {
-          return $this->responseNotFound('Oops the movie you requested was not found');
+        if (! $actor) {
+          return $this->responseNotFound('Oops the actor was not found');
         }
 
         return $this->responseOk([
-            'film'=> $this->transformer->transform($actor)
+          'message' => 'success',
+          'actor' => $actor
         ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  int  $ActorId
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(ActorRequest $request, $ActorId)
     {
-        $actor = Actor::find($id);
+        //TODO
+        /**
+         *  1. Validate the request
+         * 2. Refactor to the logic to create a new actor to the
+         */
+        $actor = Actor::find($ActorId);
 
         if ($actor == null ) {
           return $this->responseNotFound('actor not found');
@@ -120,18 +110,16 @@ class ActorsController extends ApiController
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int  $ActorId
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($ActorId)
     {
-        $actor = Actor::find($id);
+        $actor = $this->repository->delete($ActorId);
 
-        if ($actor == null) {
-          return $this->responseNotFound('actor not found');
+        if (! $actor) {
+          return 'coul not delete actor';
         }
-
-        $actor->delete();
 
         return $this->responseOk([
           'message' => 'actor deleted successfully'
